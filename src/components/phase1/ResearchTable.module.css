@@ -1,0 +1,97 @@
+.wrapper {
+  flex: 1;
+  overflow: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.table thead {
+  position: sticky;
+  top: 0;
+  background: var(--color-bg);
+  z-index: 1;
+}
+
+.table th {
+  text-align: left;
+  padding: 8px 10px;
+  border-bottom: 2px solid var(--color-border);
+  font-weight: 600;
+  color: var(--color-text-muted);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  white-space: nowrap;
+}
+
+.table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--color-border);
+  vertical-align: top;
+}
+
+.table tbody tr:hover {
+  background: rgba(42,107,78,0.04);
+}
+
+.table tbody tr.selected {
+  background: rgba(42,107,78,0.08);
+}
+
+.checkCol {
+  width: 36px;
+  text-align: center !important;
+}
+
+.regionCell {
+  white-space: nowrap;
+  color: var(--color-text-muted);
+  font-size: 12px;
+}
+
+.titleCell {
+  font-weight: 500;
+  min-width: 160px;
+}
+
+.descCell {
+  color: var(--color-text-muted);
+  max-width: 300px;
+}
+
+.timeCell {
+  white-space: nowrap;
+  color: var(--color-text-muted);
+}
+
+.actionsCol {
+  width: 64px;
+  white-space: nowrap;
+}
+
+.iconBtn {
+  background: none;
+  border: none;
+  padding: 2px 4px;
+  font-size: 14px;
+  opacity: 0.5;
+  border-radius: 4px;
+}
+
+.iconBtn:hover {
+  opacity: 1;
+  background: var(--color-bg);
+}
+
+.empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--color-text-muted);
+  font-size: 15px;
+}

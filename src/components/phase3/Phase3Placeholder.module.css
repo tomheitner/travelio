@@ -1,0 +1,22 @@
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.content {
+  text-align: center;
+  color: var(--color-text-muted);
+}
+
+.content h2 {
+  font-size: 20px;
+  margin-bottom: 8px;
+  color: var(--color-text);
+}
+
+.content p {
+  font-size: 14px;
+  max-width: 360px;
+}
