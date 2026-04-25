@@ -1,8 +1,11 @@
-import { useMemo } from 'react'
-import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from 'react-leaflet'
+import { useMemo, useEffect, useRef } from 'react'
+import { MapContainer, TileLayer, Polyline, useMap } from 'react-leaflet'
 import { usePlanner } from '../../context/PlannerContext'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
+import 'leaflet.markercluster/dist/MarkerCluster.css'
+import 'leaflet.markercluster/dist/MarkerCluster.Default.css'
+import 'leaflet.markercluster'
 import styles from './MapView.module.css'
 
 // Fix leaflet default icon paths broken by Vite
@@ -38,7 +41,59 @@ function FitBounds({ positions }) {
   return null
 }
 
-export default function MapView({ rows, pendingCount, failedCount, onRetry }) {
+// Manages a MarkerClusterGroup layer imperatively so it works with react-leaflet v4.
+function ClusterLayer({ geocoded, itineraryIds, highlightedRowId, onHighlight, dispatch }) {
+  const map = useMap()
+  const clusterRef = useRef(null)
+
+  useEffect(() => {
+    const cluster = L.markerClusterGroup({ maxClusterRadius: 40, animate: true })
+    clusterRef.current = cluster
+    map.addLayer(cluster)
+    return () => { map.removeLayer(cluster) }
+  }, [map])
+
+  useEffect(() => {
+    const cluster = clusterRef.current
+    if (!cluster) return
+    cluster.clearLayers()
+
+    geocoded.forEach(row => {
+      const itinIndex = itineraryIds.indexOf(row.id)
+      const inItinerary = itinIndex !== -1
+      const label = inItinerary ? itinIndex + 1 : '·'
+      const isHighlighted = highlightedRowId === row.id
+
+      const marker = L.marker([row.lat, row.lng], {
+        icon: makeNumberedIcon(label, inItinerary || isHighlighted),
+      })
+
+      const popupEl = document.createElement('div')
+      popupEl.innerHTML = `
+        <strong>${row.title}</strong><br/>
+        ${row.city}<br/>
+        <span style="color:#6b6b6b;font-size:12px">${row.time}</span>
+      `
+      const btn = document.createElement('button')
+      btn.style.cssText = 'margin-top:6px;padding:3px 10px;background:' +
+        (inItinerary ? '#c0392b' : '#2a6b4e') +
+        ';color:#fff;border:none;border-radius:4px;cursor:pointer'
+      btn.textContent = inItinerary ? 'Remove' : '+ Add to itinerary'
+      btn.addEventListener('click', () => {
+        dispatch({ type: inItinerary ? 'REMOVE_FROM_ITINERARY' : 'ADD_TO_ITINERARY', rowId: row.id })
+      })
+      popupEl.appendChild(btn)
+
+      marker.bindPopup(popupEl)
+      marker.on('click', () => onHighlight?.(row.id))
+      cluster.addLayer(marker)
+    })
+  }) // intentionally no dep array — re-sync every render so icons stay current
+
+  return null
+}
+
+export default function MapView({ rows, pendingCount, failedCount, onRetry, highlightedRowId, onHighlight }) {
   const { state, dispatch } = usePlanner()
 
   // Only rows that have been geocoded
@@ -51,7 +106,6 @@ export default function MapView({ rows, pendingCount, failedCount, onRetry }) {
     .filter(Boolean)
 
   const polylinePoints = ordered.map(r => [r.lat, r.lng])
-
   const positions = geocoded.map(r => [r.lat, r.lng])
 
   return (
@@ -70,42 +124,13 @@ export default function MapView({ rows, pendingCount, failedCount, onRetry }) {
         {polylinePoints.length > 1 && (
           <Polyline positions={polylinePoints} color="#e07b39" weight={2} dashArray="6 4" />
         )}
-        {geocoded.map(row => {
-          const itinIndex = itineraryIds.indexOf(row.id)
-          const inItinerary = itinIndex !== -1
-          const label = inItinerary ? itinIndex + 1 : '·'
-          return (
-            <Marker
-              key={row.id}
-              position={[row.lat, row.lng]}
-              icon={makeNumberedIcon(label, inItinerary)}
-            >
-              <Popup>
-                <strong>{row.title}</strong><br />
-                {row.city}<br />
-                <span style={{ color: '#6b6b6b', fontSize: 12 }}>{row.time}</span><br />
-                {!inItinerary ? (
-                  <button
-                    style={{ marginTop: 6, padding: '3px 10px', background: '#2a6b4e', color: '#fff', border: 'none', borderRadius: 4, cursor: 'pointer' }}
-                    onClick={() => dispatch({ type: 'ADD_TO_ITINERARY', rowId: row.id })}
-                  >
-                    + Add to itinerary
-                  </button>
-                ) : (
-                  <button
-                    style={{ marginTop: 6, padding: '3px 10px', background: '#c0392b', color: '#fff', border: 'none', borderRadius: 4, cursor: 'pointer' }}
-                    onClick={() => dispatch({ type: 'REMOVE_FROM_ITINERARY', rowId: row.id })}
-                  >
-                    Remove
-                  </button>
-                )}
-              </Popup>
-            </Marker>
-          )
-        })}
-        {rows.filter(r => r.lat === null).map(row => (
-          <span key={row.id} />
-        ))}
+        <ClusterLayer
+          geocoded={geocoded}
+          itineraryIds={itineraryIds}
+          highlightedRowId={highlightedRowId}
+          onHighlight={onHighlight}
+          dispatch={dispatch}
+        />
       </MapContainer>
       {pendingCount > 0 && (
         <div className={styles.geocodingBanner}>

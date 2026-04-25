@@ -22,7 +22,13 @@
   font-size: 14px;
 }
 
-.count {
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.summary {
   font-size: 12px;
   color: var(--color-text-muted);
 }
@@ -49,13 +55,34 @@
   padding-top: 8px;
 }
 
+.unplannedHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 4px 6px;
+}
+
 .sectionLabel {
   font-size: 11px;
   font-weight: 600;
   color: var(--color-text-muted);
   text-transform: uppercase;
   letter-spacing: 0.4px;
-  padding: 0 4px 6px;
+}
+
+.addAllBtn {
+  padding: 2px 8px;
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius);
+  background: none;
+  color: var(--color-primary);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.addAllBtn:hover {
+  background: var(--color-primary);
+  color: #fff;
 }
 
 .unplannedRow {
@@ -80,6 +107,45 @@
   color: var(--color-danger);
   font-size: 11px;
   font-weight: 600;
+  border: 1px solid rgba(192,57,43,0.25);
+  cursor: pointer;
+}
+
+.failedBadge:hover {
+  background: rgba(192,57,43,0.22);
+}
+
+.coordEntry {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.coordInput {
+  width: 58px;
+  padding: 2px 5px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  font-size: 11px;
+}
+
+.coordApply {
+  padding: 2px 6px;
+  border: none;
+  border-radius: var(--radius);
+  background: var(--color-primary);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.coordCancel {
+  padding: 2px 6px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: none;
+  font-size: 11px;
 }
 
 .unplannedTitle {

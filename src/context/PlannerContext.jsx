@@ -63,7 +63,7 @@ function reducer(state, action) {
       if (already) return state
       return {
         ...state,
-        itinerary: [...state.itinerary, { rowId: action.rowId, date: '', notes: '' }],
+        itinerary: [...state.itinerary, { rowId: action.rowId, date: '', slot: '', notes: '' }],
       }
     }
 
