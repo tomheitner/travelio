@@ -1,0 +1,26 @@
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.dateHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 8px 4px;
+  margin-top: 4px;
+}
+
+.dateLabel {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--color-primary);
+}
+
+.itemCount {
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
